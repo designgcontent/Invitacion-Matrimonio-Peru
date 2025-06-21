@@ -1128,15 +1128,6 @@ section.instagram .boton { margin-top: 0; }
     color: var(--color-pallete-1);
 }
 
-/* --- NUEVO ESTILO PARA EL MODAL INTERMEDIO --- */
-.pre-confirm-options {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    width: 100%;
-    margin-top: 1.5rem;
-}
-
 .modal-form .attendance-options {
     display: flex;
     justify-content: space-around;

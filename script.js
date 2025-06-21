@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    // Fecha del evento: Sábado 18 de Octubre del 2025, 2:00 PM (hora de Lima)
-    const weddingDate = new Date('Oct 18, 2025 14:00:00 GMT-0500').getTime();
+    // Actualizado: Ceremonia a las 2:00 PM GMT-0500 (hora de Lima)
+    // Sábado 18 de Octubre del 2025, 2:00 PM (14:00)
+    const weddingDate = new Date('Oct 18, 2025 14:00:00 GMT-0500').getTime(); // Lima time (GMT-5)
     const daysEl = document.getElementById('days');
     const hoursEl = document.getElementById('hours');
     const minutesEl = document.getElementById('minutes');
@@ -49,6 +50,10 @@ document.addEventListener('DOMContentLoaded', function() {
         countdownInterval = setInterval(updateCountdown, 1000);
     } else {
         console.warn("Elementos del contador no encontrados. No se iniciará.");
+        if (countdownEl && !countdownEl.hasChildNodes()) countdownEl.innerText = "Contador no disponible.";
+        if (faltaTitle) faltaTitle.style.display = 'none';
+        const heartContainer = document.getElementById('lottie-corazon-falta');
+        if (heartContainer) heartContainer.style.display = 'none';
     }
 
     // Lottie Animations
@@ -73,11 +78,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     };
-    
-    // Cargar todas las animaciones Lottie
+
     loadLottieAnimation(document.getElementById('lottie-adorno-frase'), 'adorno_frase_portada.json', "Error Lottie Adorno Frase:");
     loadLottieAnimation(document.getElementById('lottie-corazon-falta'), 'corazon-falta.json', "Error Lottie Corazon Falta:");
-    loadLottieAnimation(document.querySelector('.col-ceremonia .anim-anillos'), 'img_ceremonia.json', "Error Lottie Anillos (Ceremonia):");
+    loadLottieAnimation(document.querySelector('.col-evento .anim-anillos'), 'img_ceremonia.json', "Error Lottie Anillos (Ceremonia):");
     loadLottieAnimation(document.querySelector('.anim-galeria'), 'json_camara.json', "Error Lottie Galería:");
     loadLottieAnimation(document.querySelector('.anim-musica'), 'img_musica.json', "Error Lottie Música:");
     loadLottieAnimation(document.querySelector('.anim-musica-modal'), 'img_musica.json', "Error Lottie Música (Modal):");
@@ -94,9 +98,6 @@ document.addEventListener('DOMContentLoaded', function() {
     loadLottieAnimation(document.querySelector('.anim-regalos-modal'), 'img_regalo.json', "Error Lottie Regalos (Modal):");
     loadLottieAnimation(document.getElementById('lottie-confirmar-evento-anim'), 'img_ceremonia.json', "Error Lottie Confirmar Evento:", { preserveAspectRatio: 'xMidYMid meet' });
     loadLottieAnimation(document.querySelector('.anim-instagram-modal'), 'img_instagram.json', "Error Lottie Instagram (Modal):");
-    loadLottieAnimation(document.getElementById('lottie-confirmar-evento-acompanante-anim'), 'img_ceremonia.json', "Error Lottie Confirmar Evento Acompañante:", { preserveAspectRatio: 'xMidYMid meet' });
-    loadLottieAnimation(document.querySelector('.anim-pre-confirmar'), 'img_ceremonia.json', "Error Lottie Pre-Confirmar:", { preserveAspectRatio: 'xMidYMid meet' });
-    
 
     // Slick Carousel
     if (typeof $ !== 'undefined' && typeof $.fn.slick === 'function') {
@@ -143,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Generic Modal Handling
     const setupModal = (modalId, openBtnId) => {
         const modal = document.getElementById(modalId);
-        const openBtn = openBtnId ? document.getElementById(openBtnId) : null;
+        const openBtn = document.getElementById(openBtnId);
         const closeBtn = modal ? modal.querySelector('.modal-close') : null;
 
         const openModal = () => {
@@ -167,19 +168,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.body.classList.remove('modal-open');
             }
         };
-        
+
         if (openBtn) {
             openBtn.addEventListener('click', (event) => {
                 event.preventDefault();
                 openModal();
             });
+        } else if (openBtnId){
+             console.warn(`Botón de apertura no encontrado: ${openBtnId}`);
         }
 
         if (closeBtn) closeBtn.addEventListener('click', closeModal);
+        else if (modal) console.warn(`Botón de cierre no encontrado para modal: ${modalId}`);
+
         if (modal) {
             modal.addEventListener('click', (event) => {
                 if (event.target === modal) closeModal();
             });
+        } else if (modalId) {
+             console.warn(`Modal no encontrado: ${modalId}`);
         }
         return { openModal, closeModal };
     };
@@ -189,12 +196,8 @@ document.addEventListener('DOMContentLoaded', function() {
     setupModal('modal-dresscode', 'open-dresscode-modal');
     setupModal('modal-tips', 'open-tips-modal');
     setupModal('modal-regalos', 'open-regalos-modal');
+    const eventoConfirmModalControls = setupModal('modal-confirmar-evento', 'open-confirmar-evento-modal');
     setupModal('modal-instagram-profiles', 'open-instagram-profiles-modal');
-    
-    // Confirmation Modals Setup
-    const preConfirmModalControls = setupModal('modal-pre-confirmar');
-    const eventoConfirmModalControls = setupModal('modal-confirmar-evento');
-    const eventoAcompananteConfirmModalControls = setupModal('modal-confirmar-evento-acompanante');
 
 
     // Escape key to close modals
@@ -220,12 +223,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const hiddenAttendanceInput = form.querySelector('input[name="asistencia"]');
         const formMessage = form.querySelector('.form-message');
         const nombreInput = form.querySelector('input[name="nombre_asistencia"]');
-        const acompananteInput = form.querySelector('input[name="nombre_acompanante"]');
-        const veggieCheckbox = form.querySelector('input[name="menu_vegetariano"]');
         const comentarioInput = form.querySelector('input[name="comentario_asistencia"]');
+        const vegetarianoCheckbox = form.querySelector('input[name="menu_vegetariano"]');
         const eventoInput = form.querySelector('input[name="evento"]');
         const submitButtons = form.querySelectorAll('button[type="submit"]');
-        const esPlural = form.dataset.plural === 'true';
+
 
         attendanceButtons.forEach(button => {
             button.addEventListener('click', () => {
@@ -235,7 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (formMessage) { formMessage.style.display = 'none'; formMessage.textContent = ''; }
             });
         });
-        
+
         if (nombreInput) {
             nombreInput.addEventListener('input', () => {
                 if (formMessage && formMessage.textContent.toLowerCase().includes('nombre')) {
@@ -253,10 +255,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     formMessage.style.display = 'none'; formMessage.textContent = ''; formMessage.style.color = 'red';
                 }
 
-                // Validation
                 if (!hiddenAttendanceInput || !hiddenAttendanceInput.value) {
                      if (formMessage) {
-                        formMessage.textContent = 'Por favor, selecciona si asistirán o no.';
+                        formMessage.textContent = 'Por favor, selecciona si asistirás o no.';
                         formMessage.style.display = 'block';
                     }
                     return;
@@ -269,40 +270,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     if(nombreInput) nombreInput.focus();
                     return;
                 }
-                if (esPlural && (!acompananteInput || !acompananteInput.value.trim())) {
-                    if (formMessage) {
-                        formMessage.textContent = 'Por favor, ingresa el nombre de tu acompañante.';
-                        formMessage.style.display = 'block';
-                    }
-                    if(acompananteInput) acompananteInput.focus();
-                    return;
-                }
 
-                // Data Collection
                 const nombre = nombreInput.value.trim();
-                const acompananteNombre = esPlural ? acompananteInput.value.trim() : null;
                 const asistenciaValue = hiddenAttendanceInput.value;
-                const deseaMenuVeggie = veggieCheckbox.checked;
+                const asistenciaTexto = asistenciaValue === 'si' ? 'Sí, confirmo asistencia' : 'No podré asistir';
                 const comentario = comentarioInput ? comentarioInput.value.trim() : '';
-                const evento = eventoInput ? eventoInput.value : 'Boda K&JP Lima';
+                const evento = eventoInput ? eventoInput.value : 'Evento Boda Lima';
                 const weddingEmail = 'matrimoniokathayjplima@gmail.com';
                 const whatsappNumber = '51993968980';
 
-                let asistenciaTexto;
-                if (asistenciaValue === 'si') {
-                    asistenciaTexto = esPlural ? 'Sí, confirmamos asistencia' : 'Sí, confirmo asistencia';
-                } else {
-                    asistenciaTexto = esPlural ? 'No podremos asistir' : 'No podré asistir';
-                }
-
                 if (submitType === 'correo') {
-                    const subject = `Confirmación Asistencia - ${evento}`;
+                    const subject = `Confirmación Asistencia Boda K&JP - ${evento}`;
                     let body = `Hola Katha y Juan Pablo,\n\nUna nueva confirmación ha llegado:\n-------------------------------------\n`;
-                    body += `Nombre: ${nombre}\n`;
-                    if (acompananteNombre) body += `Acompañante: ${acompananteNombre}\n`;
-                    body += `Evento: ${evento}\nAsistencia: ${asistenciaTexto}\n`;
-                    if (comentario) body += `Datos adicionales/alergias: ${comentario}\n`;
-                    if (deseaMenuVeggie) body += `Opción Menú: Vegetariano\n`;
+                    body += `Nombre: ${nombre}\nEvento: ${evento}\nAsistencia: ${asistenciaTexto}\n`;
+                    if (comentario) body += `Datos adicionales, alergias: ${comentario}\n`;
+                    if (vegetarianoCheckbox && vegetarianoCheckbox.checked) {
+                        body += `Menú Vegetariano: Sí\n`;
+                    }
                     body += `-------------------------------------\n\nSaludos,\n${nombre}`;
                     const mailtoLink = `mailto:${weddingEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
@@ -313,13 +297,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     setTimeout(() => { window.location.href = mailtoLink; }, 500);
 
                 } else if (submitType === 'whatsapp') {
-                    let whatsappText = `¡Hola Katha y Juan Pablo! 👋\n\nQueremos confirmar nuestra asistencia para su boda:\n-------------------------------------\n`;
+                    let whatsappText = `¡Hola Katha y Juan Pablo! 👋\n\nQuiero confirmar mi asistencia para su boda:\n-------------------------------------\n`;
                     whatsappText += `*Evento:* ${evento}\n`;
                     whatsappText += `*Nombre:* ${nombre}\n`;
-                     if (acompananteNombre) whatsappText += `*Acompañante:* ${acompananteNombre}\n`;
                     whatsappText += `*Asistencia:* ${asistenciaTexto}\n`;
-                    if (comentario) whatsappText += `*Datos adicionales/alergias:* ${comentario}\n`;
-                    if (deseaMenuVeggie) whatsappText += `*Opción Menú:* Vegetariano\n`;
+                    if (comentario) {
+                        whatsappText += `*Datos adicionales, alergias:* ${comentario}\n`;
+                    }
+                    if (vegetarianoCheckbox && vegetarianoCheckbox.checked) {
+                        whatsappText += `*Menú Vegetariano:* Sí\n`;
+                    }
                     whatsappText += `-------------------------------------\n¡Nos vemos! 🎉`;
 
                     const whatsappLink = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(whatsappText)}`;
@@ -336,40 +323,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     form.reset();
                     attendanceButtons.forEach(btn => btn.classList.remove('selected'));
                     if (hiddenAttendanceInput) hiddenAttendanceInput.value = '';
-                    if (veggieCheckbox) veggieCheckbox.checked = false;
                     if (formMessage) formMessage.style.display = 'none';
                 }, 4000);
             });
         });
     };
-    
-    // Initialize all confirmation forms
-    handleConfirmationForm('form-confirmar-evento', eventoConfirmModalControls);
-    handleConfirmationForm('form-confirmar-evento-acompanante', eventoAcompananteConfirmModalControls);
 
-    
-    // Confirmation Flow Logic
-    function openPreConfirmModal() {
-        preConfirmModalControls.openModal();
+    if (document.getElementById('form-confirmar-evento')) {
+        handleConfirmationForm('form-confirmar-evento', eventoConfirmModalControls);
     }
-    
-    // Main button
-    document.getElementById('open-confirmar-evento-modal').addEventListener('click', (e) => { e.preventDefault(); openPreConfirmModal(); });
-    
-    // Footer link
-    document.getElementById('confirmar-evento-footer-link').addEventListener('click', (e) => { e.preventDefault(); openPreConfirmModal(); });
-
-    // Pre-confirmation modal buttons logic
-    document.getElementById('pre-confirmar-solo-btn').addEventListener('click', () => {
-        preConfirmModalControls.closeModal();
-        eventoConfirmModalControls.openModal();
-    });
-
-    document.getElementById('pre-confirmar-acompanante-btn').addEventListener('click', () => {
-        preConfirmModalControls.closeModal();
-        eventoAcompananteConfirmModalControls.openModal();
-    });
-
 
     // Music Suggestion Form Handling
     const handleMusicSuggestionForm = () => {
@@ -462,17 +424,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         return `${baseUrl}&${params.toString()}`;
     }
-
-    const limaMainEventLocation = "El Tomate De Cieneguilla";
-    const limaMainEventDate = "20251018";
-    const limaTimeZone = "America/Lima";
-
-    const limaEventDetails = {
-        text: "Ceremonia y Fiesta Boda K&JP - Lima",
-        dates: `${limaMainEventDate}T140000/${limaMainEventDate}T230000`, // 2:00 PM a 11:00 PM
-        ctz: limaTimeZone,
-        details: "Ceremonia y Fiesta de Nuestra Boda - Katha y Juan Pablo en Lima\nLugar: El Tomate De Cieneguilla\n¡Te esperamos para celebrar!",
-        location: limaMainEventLocation
+    
+    const limaWeddingEventDetails = {
+        text: "Boda K&JP: Ceremonia y Fiesta",
+        dates: "20251018T140000/20251018T235900", // 2:00 PM to 11:59 PM Lima Time
+        ctz: "America/Lima",
+        details: "Ceremonia y Fiesta de Nuestra Boda - Katha y Juan Pablo en Lima\nLugar: El Tomate De Cieneguilla\nDress code: Elegante y formal.\n¡Te esperamos para celebrar!",
+        location: "El Tomate De Cieneguilla"
     };
 
     const agendarEventoBtn = document.getElementById('agendar-evento-btn');
@@ -481,23 +439,32 @@ document.addEventListener('DOMContentLoaded', function() {
     if (agendarEventoBtn) {
         agendarEventoBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            window.open(generateGoogleCalendarLink(limaEventDetails), '_blank');
+            window.open(generateGoogleCalendarLink(limaWeddingEventDetails), '_blank');
         });
     }
-
     if (agendarEventoFooterLink) {
         agendarEventoFooterLink.addEventListener('click', (e) => {
             e.preventDefault();
-            window.open(generateGoogleCalendarLink(limaEventDetails), '_blank');
+            window.open(generateGoogleCalendarLink(limaWeddingEventDetails), '_blank');
         });
     }
 
-    // Footer Link Handler for Music Modal
+    // Footer Link Handlers for Modals
+    const confirmarEventoFooter = document.getElementById('confirmar-evento-footer-link');
+    const openConfirmarEventoBtn = document.getElementById('open-confirmar-evento-modal');
+    if (confirmarEventoFooter && openConfirmarEventoBtn) {
+        confirmarEventoFooter.addEventListener('click', (e) => {
+            e.preventDefault();
+            openConfirmarEventoBtn.click();
+        });
+    }
+
     const sugerirCancionFooter = document.getElementById('sugerir-cancion-footer-link');
-    if (sugerirCancionFooter) {
+    const openMusicaBtn = document.getElementById('open-musica-modal');
+    if (sugerirCancionFooter && openMusicaBtn) {
         sugerirCancionFooter.addEventListener('click', (e) => {
             e.preventDefault();
-            musicaModalControls.openModal();
+            openMusicaBtn.click();
         });
     }
 });
