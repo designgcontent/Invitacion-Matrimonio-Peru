@@ -288,13 +288,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         body += `Menú Vegetariano: Sí\n`;
                     }
                     body += `-------------------------------------\n\nSaludos,\n${nombre}`;
-                    const mailtoLink = `mailto:${weddingEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                    
+                    // MODIFICADO: Se construye un enlace de Gmail en lugar de un 'mailto:' genérico.
+                    const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${weddingEmail}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
                     if (formMessage) {
-                        formMessage.textContent = 'Gracias. Serás redirigido a tu cliente de correo para enviar la confirmación.';
+                        // MODIFICADO: El mensaje ahora especifica que se abrirá Gmail.
+                        formMessage.textContent = 'Gracias. Abriremos Gmail en una nueva pestaña para que envíes la confirmación.';
                         formMessage.style.color = 'green'; formMessage.style.display = 'block';
                     }
-                    setTimeout(() => { window.location.href = mailtoLink; }, 500);
+                    
+                    // MODIFICADO: Se abre el enlace de Gmail en una nueva pestaña del navegador.
+                    setTimeout(() => { window.open(gmailLink, '_blank'); }, 500);
 
                 } else if (submitType === 'whatsapp') {
                     let whatsappText = `¡Hola Katha y Juan Pablo! 👋\n\nQuiero confirmar mi asistencia para su boda:\n-------------------------------------\n`;
@@ -384,16 +389,19 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             body += `-------------------------------------\n\n¡Que siga la música!`;
 
-            const mailtoLink = `mailto:${weddingEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            // MODIFICADO: Se construye un enlace de Gmail en lugar de 'mailto:'.
+            const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${weddingEmail}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
             if (formMessage) {
-                formMessage.textContent = 'Gracias por tu sugerencia. Serás redirigido a tu cliente de correo.';
+                // MODIFICADO: El mensaje ahora especifica que se abrirá Gmail.
+                formMessage.textContent = 'Gracias por tu sugerencia. Abriremos Gmail en una nueva pestaña.';
                 formMessage.style.color = 'green';
                 formMessage.style.display = 'block';
             }
 
+            // MODIFICADO: Se abre el enlace de Gmail en una nueva pestaña.
             setTimeout(() => {
-                window.location.href = mailtoLink;
+                window.open(gmailLink, '_blank');
             }, 500);
 
             setTimeout(() => {
