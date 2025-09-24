@@ -1,8 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    // Actualizado: Ceremonia a las 2:00 PM GMT-0500 (hora de Lima)
-    // Sábado 18 de Octubre del 2025, 2:00 PM (14:00)
-    const weddingDate = new Date('Oct 18, 2025 14:00:00 GMT-0500').getTime(); // Lima time (GMT-5)
+    const weddingDate = new Date('Oct 18, 2025 14:00:00 GMT-0500').getTime(); 
     const daysEl = document.getElementById('days');
     const hoursEl = document.getElementById('hours');
     const minutesEl = document.getElementById('minutes');
@@ -27,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
             const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / 1000 * 60);
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
             if (daysEl) daysEl.innerText = days;
@@ -56,7 +54,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (heartContainer) heartContainer.style.display = 'none';
     }
 
-    // Lottie Animations
     const loadLottieAnimation = (container, path, errorMessage, rendererSettings = {}) => {
         if (container) {
             try {
@@ -99,7 +96,6 @@ document.addEventListener('DOMContentLoaded', function() {
     loadLottieAnimation(document.getElementById('lottie-confirmar-evento-anim'), 'img_ceremonia.json', "Error Lottie Confirmar Evento:", { preserveAspectRatio: 'xMidYMid meet' });
     loadLottieAnimation(document.querySelector('.anim-instagram-modal'), 'img_instagram.json', "Error Lottie Instagram (Modal):");
 
-    // Slick Carousel
     if (typeof $ !== 'undefined' && typeof $.fn.slick === 'function') {
         $('.slick-carousel').slick({
             dots: true,
@@ -134,14 +130,12 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error("Error: jQuery o Slick Carousel no están cargados ANTES de script.js.");
     }
 
-    // Fancybox
     if (typeof Fancybox !== 'undefined') {
         Fancybox.bind("[data-fancybox='galeria']", { loop: true });
     } else {
         console.warn("Fancybox no está cargado (opcional).");
     }
 
-    // Generic Modal Handling
     const setupModal = (modalId, openBtnId) => {
         const modal = document.getElementById(modalId);
         const openBtn = document.getElementById(openBtnId);
@@ -150,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const openModal = () => {
             if (modal) {
                 modal.style.display = 'flex';
-                void modal.offsetWidth; // Trigger reflow
+                void modal.offsetWidth;
                 modal.classList.add('visible');
                 document.body.classList.add('modal-open');
             }
@@ -191,7 +185,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return { openModal, closeModal };
     };
 
-    // Setup all modals
     const musicaModalControls = setupModal('modal-musica', 'open-musica-modal');
     setupModal('modal-dresscode', 'open-dresscode-modal');
     setupModal('modal-tips', 'open-tips-modal');
@@ -200,7 +193,6 @@ document.addEventListener('DOMContentLoaded', function() {
     setupModal('modal-instagram-profiles', 'open-instagram-profiles-modal');
 
 
-    // Escape key to close modals
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') {
             const visibleModal = document.querySelector('.modal-overlay.visible');
@@ -211,7 +203,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Confirmation Form Handling
     const handleConfirmationForm = (formId, modalControls) => {
         const form = document.getElementById(formId);
         if (!form) {
@@ -223,11 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const hiddenAttendanceInput = form.querySelector('input[name="asistencia"]');
         const formMessage = form.querySelector('.form-message');
         const nombreInput = form.querySelector('input[name="nombre_asistencia"]');
-        const comentarioInput = form.querySelector('input[name="comentario_asistencia"]');
-        const vegetarianoCheckbox = form.querySelector('input[name="menu_vegetariano"]');
-        const eventoInput = form.querySelector('input[name="evento"]');
         const submitButtons = form.querySelectorAll('button[type="submit"]');
-
 
         attendanceButtons.forEach(button => {
             button.addEventListener('click', () => {
@@ -249,10 +236,11 @@ document.addEventListener('DOMContentLoaded', function() {
         submitButtons.forEach(submitButton => {
             submitButton.addEventListener('click', function(event) {
                 event.preventDefault();
-                const submitType = this.value;
 
                 if (formMessage) {
-                    formMessage.style.display = 'none'; formMessage.textContent = ''; formMessage.style.color = 'red';
+                    formMessage.style.display = 'none';
+                    formMessage.textContent = '';
+                    formMessage.style.color = 'red';
                 }
 
                 if (!hiddenAttendanceInput || !hiddenAttendanceInput.value) {
@@ -271,56 +259,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
-                const nombre = nombreInput.value.trim();
-                const asistenciaValue = hiddenAttendanceInput.value;
-                const asistenciaTexto = asistenciaValue === 'si' ? 'Sí, confirmo asistencia' : 'No podré asistir';
-                const comentario = comentarioInput ? comentarioInput.value.trim() : '';
-                const evento = eventoInput ? eventoInput.value : 'Evento Boda Lima';
-                const weddingEmail = 'matrimoniokathayjplima@gmail.com';
-                const whatsappNumber = '51993968980';
-
-                if (submitType === 'correo') {
-                    const subject = `Confirmación Asistencia Boda K&JP - ${evento}`;
-                    let body = `Hola Katha y Juan Pablo,\n\nUna nueva confirmación ha llegado:\n-------------------------------------\n`;
-                    body += `Nombre: ${nombre}\nEvento: ${evento}\nAsistencia: ${asistenciaTexto}\n`;
-                    if (comentario) body += `Datos adicionales, alergias: ${comentario}\n`;
-                    if (vegetarianoCheckbox && vegetarianoCheckbox.checked) {
-                        body += `Menú Vegetariano: Sí\n`;
-                    }
-                    body += `-------------------------------------\n\nSaludos,\n${nombre}`;
-                    
-                    // MODIFICADO: Se construye un enlace de Gmail en lugar de un 'mailto:' genérico.
-                    const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${weddingEmail}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-                    if (formMessage) {
-                        // MODIFICADO: El mensaje ahora especifica que se abrirá Gmail.
-                        formMessage.textContent = 'Gracias. Abriremos Gmail en una nueva pestaña para que envíes la confirmación.';
-                        formMessage.style.color = 'green'; formMessage.style.display = 'block';
-                    }
-                    
-                    // MODIFICADO: Se abre el enlace de Gmail en una nueva pestaña del navegador.
-                    setTimeout(() => { window.open(gmailLink, '_blank'); }, 500);
-
-                } else if (submitType === 'whatsapp') {
-                    let whatsappText = `¡Hola Katha y Juan Pablo! 👋\n\nQuiero confirmar mi asistencia para su boda:\n-------------------------------------\n`;
-                    whatsappText += `*Evento:* ${evento}\n`;
-                    whatsappText += `*Nombre:* ${nombre}\n`;
-                    whatsappText += `*Asistencia:* ${asistenciaTexto}\n`;
-                    if (comentario) {
-                        whatsappText += `*Datos adicionales, alergias:* ${comentario}\n`;
-                    }
-                    if (vegetarianoCheckbox && vegetarianoCheckbox.checked) {
-                        whatsappText += `*Menú Vegetariano:* Sí\n`;
-                    }
-                    whatsappText += `-------------------------------------\n¡Nos vemos! 🎉`;
-
-                    const whatsappLink = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(whatsappText)}`;
-
-                    if (formMessage) {
-                        formMessage.textContent = 'Gracias. Serás redirigido a WhatsApp para enviar la confirmación.';
-                        formMessage.style.color = 'green'; formMessage.style.display = 'block';
-                    }
-                    setTimeout(() => { window.open(whatsappLink, '_blank'); }, 500);
+                if (formMessage) {
+                    formMessage.textContent = 'La lista de invitados ya se cerró.';
+                    formMessage.style.color = 'red';
+                    formMessage.style.display = 'block';
                 }
 
                 setTimeout(() => {
@@ -338,7 +280,6 @@ document.addEventListener('DOMContentLoaded', function() {
         handleConfirmationForm('form-confirmar-evento', eventoConfirmModalControls);
     }
 
-    // Music Suggestion Form Handling
     const handleMusicSuggestionForm = () => {
         const form = document.getElementById('form-sugerir-musica');
         if (!form) {
@@ -389,17 +330,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             body += `-------------------------------------\n\n¡Que siga la música!`;
 
-            // MODIFICADO: Se construye un enlace de Gmail en lugar de 'mailto:'.
             const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${weddingEmail}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
             if (formMessage) {
-                // MODIFICADO: El mensaje ahora especifica que se abrirá Gmail.
                 formMessage.textContent = 'Gracias por tu sugerencia. Abriremos Gmail en una nueva pestaña.';
                 formMessage.style.color = 'green';
                 formMessage.style.display = 'block';
             }
 
-            // MODIFICADO: Se abre el enlace de Gmail en una nueva pestaña.
             setTimeout(() => {
                 window.open(gmailLink, '_blank');
             }, 500);
@@ -419,7 +357,6 @@ document.addEventListener('DOMContentLoaded', function() {
     handleMusicSuggestionForm();
 
 
-    // Google Calendar Link Generation
     function generateGoogleCalendarLink(details) {
         const baseUrl = 'https://www.google.com/calendar/render?action=TEMPLATE';
         const params = new URLSearchParams();
@@ -435,7 +372,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const limaWeddingEventDetails = {
         text: "Boda K&JP: Ceremonia y Fiesta",
-        dates: "20251018T140000/20251018T235900", // 2:00 PM to 11:59 PM Lima Time
+        dates: "20251018T140000/20251018T235900",
         ctz: "America/Lima",
         details: "Ceremonia y Fiesta de Nuestra Boda - Katha y Juan Pablo en Lima\nLugar: El Tomate De Cieneguilla\nDress code: Elegante y formal.\n¡Te esperamos para celebrar!",
         location: "El Tomate De Cieneguilla"
@@ -457,7 +394,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Footer Link Handlers for Modals
     const confirmarEventoFooter = document.getElementById('confirmar-evento-footer-link');
     const openConfirmarEventoBtn = document.getElementById('open-confirmar-evento-modal');
     if (confirmarEventoFooter && openConfirmarEventoBtn) {
